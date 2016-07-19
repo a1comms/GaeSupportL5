@@ -5,13 +5,16 @@ namespace Shpasser\GaeSupportL5\Storage;
 use Dotenv;
 use InvalidArgumentException;
 
+define('CONFIG_PATH', 'cachefs://'.$_SERVER['APPLICATION_ID'].'/'.$_SERVER['CURRENT_VERSION_ID'].'/'.$_SERVER['CURRENT_MODULE_ID'].'/bootstrap/cache');
+define('COMPILED_VIEWS_PATH', 'cachefs://'.$_SERVER['APPLICATION_ID'].'/'.$_SERVER['CURRENT_VERSION_ID'].'/'.$_SERVER['CURRENT_MODULE_ID'].'/framework/views');
+
 /**
  * Initializes caching of Laravel 5.1 configuration files on GAE.
  */
 class Optimizer
 {
-    const CONFIG_PATH = 'cachefs://bootstrap/cache';
-    const COMPILED_VIEWS_PATH = 'cachefs://framework/views';
+    const CONFIG_PATH = CONFIG_PATH;
+    const COMPILED_VIEWS_PATH = COMPILED_VIEWS_PATH;
 
     /**
      * @var boolean
