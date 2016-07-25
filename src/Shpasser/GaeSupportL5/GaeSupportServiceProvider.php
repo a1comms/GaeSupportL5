@@ -2,7 +2,7 @@
 
 namespace Shpasser\GaeSupportL5;
 
-use Illuminate\Session;
+use Session;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem as Flysystem;
