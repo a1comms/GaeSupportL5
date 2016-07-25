@@ -8,17 +8,18 @@ use Shpasser\GaeSupportL5\Storage\MemcacheContainer;
 use SessionHandlerInterface;
 
 define('SESS_APP_NAME', @$_SERVER['APPLICATION_ID'] . '_' . @$_SERVER['CURRENT_MODULE_ID']);
+define('SESS_APP_NAME_SESS', '_' . SESS_APP_NAME . '_sess_');
 
 /**
-* DataStoreSessionHandler
-*
-* @uses     SessionHandlerInterface
-*
-* @category app
-*/
+ * DataStoreSessionHandler
+ *
+ * @uses     SessionHandlerInterface
+ *
+ * @category app
+ */
 class DataStoreSessionHandler implements SessionHandlerInterface
 {
-    const SESSION_PREFIX = '_' . SESS_APP_NAME . '_sess_';
+    const SESSION_PREFIX = SESS_APP_NAME_SESS;
 
     /**
      * $expire
