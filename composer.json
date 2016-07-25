@@ -10,7 +10,7 @@
         {
             "name": "Samuel Melrose",
             "email": "sam@infitialis.com"
-        },
+        }
     ],
     "require": {
         "php": ">=5.4.0",
