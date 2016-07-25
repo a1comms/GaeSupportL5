@@ -72,6 +72,14 @@ be also defined.
 
 `--db-socket` is set using the following format: `/cloudsql/<app-id>:<cloud-sql-instance-name>`. Where `<cloud-sql-instance-name>` is the Cloud SQL instance name and `<app-id>` is the name of the application it belongs to.
 
+### Persistent Sessions
+
+Provided is a session driver using memcached backed by DataStore, giving you the best of both worlds when it comes to speed and persistance.
+
+To make use of this, set `SESSION_DRIVER=gae` in `.env`
+
+If you don't require persistence and are happy with purely memcached, please see the previous session documentation below.
+
 ### Mail
 
 The mail driver configuration can be found in `config/mail.php` and `.env.production`,
