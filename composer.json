@@ -1,12 +1,16 @@
 {
     "name": "iamacarpet/gae-support-l5",
-    "description": "Google App Engine Support for Laravel 5.1 apps.",
+    "description": "Google App Engine & Local SDK Support for Laravel 5.1 apps.",
     "license": "MIT",
     "authors": [
         {
             "name": "Ron Shpasser",
             "email": "shpasser@gmail.com"
-        }
+        },
+        {
+            "name": "Samuel Melrose",
+            "email": "sam@infitialis.com"
+        },
     ],
     "require": {
         "php": ">=5.4.0",
