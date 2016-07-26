@@ -88,7 +88,7 @@ To do this, create a `cron.yaml` file that calls `/gae/sessiongc`, for example:
 ```yaml
 cron:
 - description: daily session clearout
-  url: /admin/session-gc
+  url: /gae/sessiongc
   schedule: every day 00:00
 ```
 
