@@ -592,6 +592,11 @@ handlers:
           static_dir: public/build
           application_readable: true
 {$pathMappings}
+        - url: /gae/.*
+          script: public/index.php
+          login: admin
+          secure: always
+
         - url: /.*
           script: public/index.php
 

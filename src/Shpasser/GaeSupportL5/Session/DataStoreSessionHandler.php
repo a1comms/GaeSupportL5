@@ -15,7 +15,7 @@ define('SESS_APP_NAME_SESS', '_' . SESS_APP_NAME . '_sess_');
  *
  * @uses     SessionHandlerInterface
  *
- * @category app
+ * @category GaeSupportL5
  */
 class DataStoreSessionHandler implements SessionHandlerInterface
 {
