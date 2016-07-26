@@ -4,10 +4,10 @@
 This package has been changed from shpasser's version for more compatibility for those working with the local GAE SDK.
 
 [![Join the chat at https://gitter.im/shpasser/GaeSupportL5](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/shpasser/GaeSupportL5?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Latest Stable Version](https://poser.pugx.org/iamacarpet/gae-support-l5/v/stable)](https://packagist.org/packages/iamacarpet/gae-support-l5)
-[![Total Downloads](https://poser.pugx.org/iamacarpet/gae-support-l5/downloads)](https://packagist.org/packages/iamacarpet/gae-support-l5)
-[![Latest Unstable Version](https://poser.pugx.org/iamacarpet/gae-support-l5/v/unstable)](https://packagist.org/packages/iamacarpet/gae-support-l5)
-[![License](https://poser.pugx.org/iamacarpet/gae-support-l5/license)](https://packagist.org/packages/iamacarpet/gae-support-l5)
+[![Latest Stable Version](https://poser.pugx.org/a1comms/gae-support-l5/v/stable)](https://packagist.org/packages/a1comms/gae-support-l5)
+[![Total Downloads](https://poser.pugx.org/a1comms/gae-support-l5/downloads)](https://packagist.org/packages/a1comms/gae-support-l5)
+[![Latest Unstable Version](https://poser.pugx.org/a1comms/gae-support-l5/v/unstable)](https://packagist.org/packages/a1comms/gae-support-l5)
+[![License](https://poser.pugx.org/a1comms/gae-support-l5/license)](https://packagist.org/packages/a1comms/gae-support-l5)
 
 Google App Engine(GAE) Support package for Laravel 5.1.
 
@@ -72,11 +72,14 @@ be also defined.
 
 `--db-socket` is set using the following format: `/cloudsql/<app-id>:<cloud-sql-instance-name>`. Where `<cloud-sql-instance-name>` is the Cloud SQL instance name and `<app-id>` is the name of the application it belongs to.
 
-### Persistent Sessions
+### Persistent Sessions in DataStore
 
-Provided is a session driver using memcached backed by DataStore, giving you the best of both worlds when it comes to speed and persistance.
+We've included a session driver using DataStore for persistance, cached by memcache for faster access times and reduced billing, giving you the best of both worlds when it comes to speed and persistance.
 
-To make use of this, set `SESSION_DRIVER=gae` in `.env`
+To make use of this, set:
+	`SESSION_DRIVER=gae` in `.env`
+	
+This should work without needing to enable billing as long as you don't have heavy usage, as minimal DataStore usage is included free.
 
 If you don't require persistence and are happy with purely memcached, please see the previous session documentation below.
 
