@@ -52,21 +52,21 @@ class GAETrace
                 $t = explode("/", $e[0]);
                 syslog(LOG_NOTICE, 'Current request is a trace sample, saving trace with additonal custom spans: ' . count(self::$spans));
 
-                $client = new Google_Client();
+                $client = new \Google_Client();
                 $client->useApplicationDefaultCredentials();
                 $client->addScope('https://www.googleapis.com/auth/cloud-platform');
 
-                $service = new Google_Service_CloudTrace($client);
+                $service = new \Google_Service_CloudTrace($client);
 
                 $projectId = substr($_SERVER['APPLICATION_ID'], (strpos($_SERVER['APPLICATION_ID'], "~")+1));
                 syslog(LOG_INFO, 'Project ID: ' . $projectId);
 
                 // Can we just create a Trace object rather than get the existing one?
-                $trace = new Google_Service_CloudTrace_Trace();
+                $trace = new \Google_Service_CloudTrace_Trace();
                 $trace->setProjectId($projectId);
                 $trace->setTraceId($t[0]);
                 $trace->setSpans(array_values(self::$spans));
-                $postBody = new Google_Service_CloudTrace_Traces($client);
+                $postBody = new \Google_Service_CloudTrace_Traces($client);
                 $postBody->setTraces([$trace]);
                 syslog(LOG_INFO, json_encode($postBody));
                 $response = $service->projects->patchTraces($projectId, $postBody);
@@ -92,7 +92,7 @@ class GAETrace
 
         self::$unfinished_spans[$id] = true;
 
-        self::$spans[$id] = new Google_Service_CloudTrace_TraceSpan();
+        self::$spans[$id] = new \Google_Service_CloudTrace_TraceSpan();
         self::$spans[$id]->setSpanId($id);
         self::$spans[$id]->setName($name);
         self::$spans[$id]->setKind("SPAN_KIND_UNSPECIFIED");
