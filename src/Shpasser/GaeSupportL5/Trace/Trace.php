@@ -138,6 +138,6 @@ class GAETrace
         // Avoid missing dot on full seconds: (string)42 and (string)42.000000 give '42'
         $time = number_format($time, 6, '.', '');
 
-        return \DateTime::createFromFormat('U.u', $time, new DateTimeZone("UTC"))->format('Y-m-d\TH:i:s.u\Z');
+        return \DateTime::createFromFormat('U.u', $time, new \DateTimeZone("UTC"))->format('Y-m-d\TH:i:s.u\Z');
     }
 }
