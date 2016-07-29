@@ -17,7 +17,8 @@ Currently supported features:
 - Mail service provider,
 - Queue service provider,
 - Database connection,
-- Filesystem.
+- Filesystem,
+- StackDriver Trace API
 
 For Lumen see https://github.com/a1comms/GaeSupportLumen.
 
