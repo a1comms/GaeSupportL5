@@ -59,18 +59,14 @@ class GAETrace
                 $service = new \Google_Service_CloudTrace($client);
 
                 $projectId = substr($_SERVER['APPLICATION_ID'], (strpos($_SERVER['APPLICATION_ID'], "~")+1));
-                syslog(LOG_INFO, 'Project ID: ' . $projectId);
 
-                // Can we just create a Trace object rather than get the existing one?
                 $trace = new \Google_Service_CloudTrace_Trace();
                 $trace->setProjectId($projectId);
                 $trace->setTraceId($t[0]);
                 $trace->setSpans(array_values(self::$spans));
                 $postBody = new \Google_Service_CloudTrace_Traces($client);
                 $postBody->setTraces([$trace]);
-                syslog(LOG_INFO, json_encode($postBody));
                 $response = $service->projects->patchTraces($projectId, $postBody);
-                syslog(LOG_INFO, var_export($response, true));
             }
         } else {
             syslog(LOG_INFO, 'No Trace Header');
