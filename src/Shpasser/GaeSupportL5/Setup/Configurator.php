@@ -331,7 +331,7 @@ class Configurator
         $replacement =
 <<<EOT
 'compiled' => env('CACHE_COMPILED_VIEWS') ?
-                  Shpasser\GaeSupportL5\Storage\Optimizer::COMPILED_VIEWS_PATH :
+                  'REPLACE_WITH_VIEW_PATH' :
                   storage_path('framework/views'),
 EOT;
 
@@ -516,13 +516,15 @@ EOT
         $strings = [
             "'${app_path}",
             "'${storage_path}",
-            "'${base_path}"
+            "'${base_path}",
+            "'REPLACE_WITH_VIEW_PATH'"
         ];
 
         $replacements = [
             "app_path().'",
             "storage_path().'",
-            "base_path().'"
+            "base_path().'",
+            '\Shpasser\GaeSupportL5\Storage\Optimizer::compiledViewsPath()'
         ];
 
         $modified = $replaceFunction($strings, $replacements, $contents);

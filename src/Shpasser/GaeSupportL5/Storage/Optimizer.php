@@ -5,16 +5,12 @@ namespace Shpasser\GaeSupportL5\Storage;
 use Dotenv;
 use InvalidArgumentException;
 
-define('CONFIG_PATH', 'cachefs://'.@$_SERVER['APPLICATION_ID'].'/'.@$_SERVER['CURRENT_VERSION_ID'].'/'.@$_SERVER['CURRENT_MODULE_ID'].'/bootstrap/cache');
-define('COMPILED_VIEWS_PATH', 'cachefs://'.@$_SERVER['APPLICATION_ID'].'/'.@$_SERVER['CURRENT_VERSION_ID'].'/'.@$_SERVER['CURRENT_MODULE_ID'].'/framework/views');
-
 /**
  * Initializes caching of Laravel 5.1 configuration files on GAE.
  */
 class Optimizer
 {
-    const CONFIG_PATH = CONFIG_PATH;
-    const COMPILED_VIEWS_PATH = COMPILED_VIEWS_PATH;
+    protected $config_path;
 
     /**
      * @var boolean
@@ -55,16 +51,27 @@ class Optimizer
      */
     public function __construct($basePath, $runningInConsole)
     {
+        $this->config_path = 'cachefs://'.@$_SERVER['APPLICATION_ID'].'/'.@$_SERVER['CURRENT_VERSION_ID'].'/'.@$_SERVER['CURRENT_MODULE_ID'].'/bootstrap/cache';
+
         $this->basePath = $basePath;
         $this->runningInConsole = $runningInConsole;
         $this->initialized = false;
         $this->cachedFiles = array();
 
-        $this->configPath   = self::CONFIG_PATH.'/config.php';
-        $this->routesPath   = self::CONFIG_PATH.'/routes.php';
-        $this->servicesPath = self::CONFIG_PATH.'/services.json';
+        $this->configPath   = $this->config_path.'/config.php';
+        $this->routesPath   = $this->config_path.'/routes.php';
+        $this->servicesPath = $this->config_path.'/services.json';
     }
 
+    /**
+     * Returns the compiled views path.
+     *
+     * @return string
+     */
+    public static function compiledViewsPath()
+    {
+        return 'cachefs://'.@$_SERVER['APPLICATION_ID'].'/'.@$_SERVER['CURRENT_VERSION_ID'].'/'.@$_SERVER['CURRENT_MODULE_ID'].'/framework/views';
+    }
 
     /**
      * Bootstraps the Optimizer.
@@ -137,8 +144,8 @@ class Optimizer
      */
     protected function buildFsTree()
     {
-        mkdir(self::CONFIG_PATH, 0777, true);
-        mkdir(self::COMPILED_VIEWS_PATH, 0777, true);
+        mkdir($this->config_path, 0777, true);
+        mkdir($this->compiledViewsPath(), 0777, true);
     }
 
     /**
