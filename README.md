@@ -257,6 +257,51 @@ do so, remove the following line from `.env.production` file:
 FILESYSTEM = gae
 ```
 
+### Google Trace API on App Engine
+While running on App Engine, 0.1 requests per seconds per instance are
+sampled by the StackDriver Trace tool (https://cloud.google.com/trace/docs/faq).
+
+Using the Trace API, we can submit custom time spans to debug performance while running on GAE.
+
+To use, you first need to initialize the class in `bootstrap/autoload.php`.
+
+Underneath the following:
+```php
+require __DIR__.'/../vendor/autoload.php';
+```
+
+Add these lines:
+```php
+/*
+|--------------------------------------------------------------------------
+| Start our GAE time tracing.
+|--------------------------------------------------------------------------
+|
+| Initiate our GAETrace class to allow us to time trace our code.
+| Starting things here will make sure we can trace as much code as possible,
+| while ensuring the destructor will always run.
+|
+*/
+use \Shpasser\GaeSupportL5\Trace\GAETrace;
+$gae_trace = new GAETrace();
+```
+
+As details in the comments, this will ensure the destructor runs when the code exits,
+submitting the Trace data to the API.
+
+After this, use of the class is static and can be used from anywhere in the Application.
+```php
+use \Shpasser\GaeSupportL5\Trace\GAETrace;
+
+//...
+
+$span_id = GAETrace::startSpan("FriendlyName");
+
+//...code here...
+
+GAETrace::endSpan($span_id);
+```
+
 ### Artisan Console for GAE
 
 To support `artisan` commands while running on GAE the package provides `Artisan Console for GAE`.
