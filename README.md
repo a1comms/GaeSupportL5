@@ -303,6 +303,44 @@ $span_id = GAETrace::startSpan("FriendlyName");
 GAETrace::endSpan($span_id);
 ```
 
+Google have suggested submitting the data to the Trace API asynchronously,
+which we can do via a Push Queue on App Engine.
+
+For this, we add the following to app.yaml
+
+```yaml
+    - url: /gae/trace_submit
+      script: public/trace.php
+      login: admin
+      secure: always
+```
+
+And create the file `public/trace.php` with the contents:
+
+```php
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Register The Composer Auto Loader
+|--------------------------------------------------------------------------
+|
+| Composer provides a convenient, automatically generated class loader
+| for our application. We just need to utilize it! We'll require it
+| into the script here so that we do not have to worry about the
+| loading of any our classes "manually". Feels great to relax.
+|
+*/
+
+require __DIR__.'/../vendor/autoload.php';
+
+use \Shpasser\GaeSupportL5\Trace\GAETrace;
+GAETrace::submitTraceAsync();
+```
+
+We are using a different non-Laravel entry point to make sure there is no recursion in submitting traces,
+which could happen if you've got the core traced and we hit an error before $force_untraced is set.
+
 ### Artisan Console for GAE
 
 To support `artisan` commands while running on GAE the package provides `Artisan Console for GAE`.

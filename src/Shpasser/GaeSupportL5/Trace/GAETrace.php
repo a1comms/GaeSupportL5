@@ -22,13 +22,23 @@ class GAETrace
     protected static $unfinished_spans = [];
 
     /**
+     * If true, this execution is forced as untraced.
+     *
+     * @var array
+     */
+    protected static $force_untraced = false;
+
+    /**
      * Setup the trace environment on startup.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($start_time = NULL)
     {
-
+        if (!empty($start_time))
+        {
+            self::startSpan('PHP_Laravel_Start', $start_time);
+        }
     }
 
     /**
@@ -40,23 +50,29 @@ class GAETrace
     {
         // End any spans that haven't been finished,
         // probably due to a premature exit.
-        foreach(self::$unfinished_spans as $k => $v){
+        foreach(self::$unfinished_spans as $k => $v)
+        {
             self::endSpan($k);
         }
 
+        if (self::$force_untraced)
+        {
+            return;
+        }
+
         // Check if we've got a Trace context header.
-        if (!empty($_SERVER['HTTP_X_CLOUD_TRACE_CONTEXT'])){
+        if (!empty($_SERVER['HTTP_X_CLOUD_TRACE_CONTEXT']))
+        {
             // Check if this is a Trace sample request that we want to log data against.
             $e = explode(";", $_SERVER['HTTP_X_CLOUD_TRACE_CONTEXT']);
-            if (@$e[1] == 'o=1'){
+            if (@$e[1] == 'o=1')
+            {
                 $t = explode("/", $e[0]);
                 syslog(LOG_NOTICE, 'Current request is a trace sample, saving trace with additonal custom spans: ' . count(self::$spans));
 
                 $client = new \Google_Client();
                 $client->useApplicationDefaultCredentials();
                 $client->addScope('https://www.googleapis.com/auth/cloud-platform');
-
-                $service = new \Google_Service_CloudTrace($client);
 
                 $projectId = substr($_SERVER['APPLICATION_ID'], (strpos($_SERVER['APPLICATION_ID'], "~")+1));
 
@@ -66,10 +82,36 @@ class GAETrace
                 $trace->setSpans(array_values(self::$spans));
                 $postBody = new \Google_Service_CloudTrace_Traces($client);
                 $postBody->setTraces([$trace]);
-                $response = $service->projects->patchTraces($projectId, $postBody);
+                if (class_exists('google\appengine\api\taskqueue\PushTask'))
+                {
+                    $task1 = new \google\appengine\api\taskqueue\PushTask('/gae/trace_submit', ['data' => serialize($postBody)], ['delay_seconds' => 0, 'method' => 'POST']);
+                    $queue = new \google\appengine\api\taskqueue\PushQueue('trace');
+                    $queue->addTasks([$task1]);
+                }
             }
         } else {
             syslog(LOG_INFO, 'No Trace Header');
+        }
+    }
+
+    public static function submitTraceAsync(){
+        self::$force_untraced = true;
+
+        if (!empty($_POST['data']))
+        {
+            $client = new \Google_Client();
+            $client->useApplicationDefaultCredentials();
+            $client->addScope('https://www.googleapis.com/auth/cloud-platform');
+
+            $service = new \Google_Service_CloudTrace($client);
+
+            $projectId = substr($_SERVER['APPLICATION_ID'], (strpos($_SERVER['APPLICATION_ID'], "~")+1));
+
+            $data = unserialize($_POST['data']);
+            if ($data instanceof \Google_Service_CloudTrace_Traces)
+            {
+                $response = $service->projects->patchTraces($projectId, $data);
+            }
         }
     }
 
@@ -79,9 +121,10 @@ class GAETrace
      *
      * @return string
      */
-    public static function startSpan($name)
+    public static function startSpan($name, $time = NULL)
     {
-        if (empty($name)){
+        if (empty($name))
+        {
             return false;
         }
         $id = self::getUniqueID();
@@ -92,7 +135,7 @@ class GAETrace
         self::$spans[$id]->setSpanId($id);
         self::$spans[$id]->setName($name);
         self::$spans[$id]->setKind("SPAN_KIND_UNSPECIFIED");
-        self::$spans[$id]->setStartTime(self::getTimeStamp());
+        self::$spans[$id]->setStartTime(self::getTimeStamp($time));
 
         return $id;
     }
@@ -104,7 +147,8 @@ class GAETrace
      */
     public static function endSpan($id)
     {
-        if (empty(self::$spans[$id])){
+        if (empty(self::$spans[$id]))
+        {
             return false;
         }
 
@@ -127,9 +171,12 @@ class GAETrace
      *
      * @return string
      */
-    public static function getTimeStamp()
+    public static function getTimeStamp($time = NULL)
     {
-        $time = microtime(true);
+        if (empty($time))
+        {
+            $time = microtime(true);
+        }
 
         // Avoid missing dot on full seconds: (string)42 and (string)42.000000 give '42'
         $time = number_format($time, 6, '.', '');
