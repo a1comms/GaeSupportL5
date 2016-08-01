@@ -306,13 +306,24 @@ GAETrace::endSpan($span_id);
 Google have suggested submitting the data to the Trace API asynchronously,
 which we can do via a Push Queue on App Engine.
 
-For this, we add the following to app.yaml
+For this, we add the following to `app.yaml`
 
 ```yaml
     - url: /gae/trace_submit
       script: public/trace.php
       login: admin
       secure: always
+```
+
+Create `queue.yaml` if it doesn't exist with the contents:
+
+```yaml
+queue:
+- name: trace
+  rate: 5/s
+  retry_parameters:
+    task_retry_limit: 7
+    task_age_limit: 2d
 ```
 
 And create the file `public/trace.php` with the contents:
