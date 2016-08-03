@@ -37,7 +37,7 @@ class GAETrace
     {
         if (!empty($start_time))
         {
-            self::startSpan('PHP_Laravel_Start', $start_time);
+            self::startSpan('PHP_Laravel_Start', [], $start_time);
         }
     }
 
@@ -121,7 +121,7 @@ class GAETrace
      *
      * @return string
      */
-    public static function startSpan($name, $time = NULL)
+    public static function startSpan($name, $labels = [], $time = NULL)
     {
         if (empty($name))
         {
@@ -135,6 +135,7 @@ class GAETrace
         self::$spans[$id]->setSpanId($id);
         self::$spans[$id]->setName($name);
         self::$spans[$id]->setKind("SPAN_KIND_UNSPECIFIED");
+        self::$spans[$id]->setLabels( array_merge( $labels, [ 'START_memory_get_usage' => self::size_convert(memory_get_usage()), 'START_memory_get_peak_usage' => self::size_convert(memory_get_peak_usage()) ] ) );
         self::$spans[$id]->setStartTime(self::getTimeStamp($time));
 
         return $id;
@@ -145,13 +146,14 @@ class GAETrace
      *
      * @return void
      */
-    public static function endSpan($id)
+    public static function endSpan($id, $labels = [])
     {
         if (empty(self::$spans[$id]))
         {
             return false;
         }
 
+        self::$spans[$id]->setLabels( array_merge( ['END_memory_get_usage' => self::size_convert(memory_get_usage()), 'END_memory_get_peak_usage' => self::size_convert(memory_get_peak_usage())], $labels, self::$spans[$id]->getLabels() ) );
         self::$spans[$id]->setEndTime(self::getTimeStamp());
         unset(self::$unfinished_spans[$id]);
     }
@@ -182,5 +184,11 @@ class GAETrace
         $time = number_format($time, 6, '.', '');
 
         return \DateTime::createFromFormat('U.u', $time, new \DateTimeZone("UTC"))->format('Y-m-d\TH:i:s.u\Z');
+    }
+
+    public static function size_convert($size)
+    {
+        $unit=array('B','KB','MB','GB','TB','PB');
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
     }
 }
