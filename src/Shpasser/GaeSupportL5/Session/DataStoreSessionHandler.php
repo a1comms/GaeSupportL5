@@ -98,7 +98,7 @@ class DataStoreSessionHandler implements SessionHandlerInterface
         // Get session max lifetime to leverage Memcache expire functionality.
         $this->expire = ini_get("session.gc_maxlifetime");
         $this->lastaccess = getTimeStamp();
-        $this->deleteTime = Carbon::now()->subMinutes(config('session.lifetime'))->toDateTimeString();
+        $this->deleteTime = Carbon::now()->subDay()->toDateTimeString();
 
         $obj_gateway_one = new \GDS\Gateway\ProtoBuf(null, null);
 
@@ -242,6 +242,10 @@ class DataStoreSessionHandler implements SessionHandlerInterface
     public function googlegc()
     {
         $arr = $this->obj_store->fetchAll("SELECT * FROM sessions WHERE lastaccess < @old", ['old' => $this->deleteTime]);
-        $this->obj_store->delete($arr);
+        syslog(LOG_INFO, 'Found '.count($arr).' records');
+
+        if (!empty($arr)) {
+            $this->obj_store->delete($arr);
+        }
     }
 }
