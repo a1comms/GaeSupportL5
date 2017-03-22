@@ -241,11 +241,15 @@ class DataStoreSessionHandler implements SessionHandlerInterface
      */
     public function googlegc()
     {
-        $arr = $this->obj_store->fetchAll("SELECT * FROM sessions WHERE lastaccess < @old", ['old' => $this->deleteTime]);
-        syslog(LOG_INFO, 'Found '.count($arr).' records');
+        $rowCount = 0;
+        do {
+            $arr = $this->obj_store->fetchAll("SELECT * FROM sessions WHERE lastaccess < @old", ['old' => $this->deleteTime]);
+            $rowCount = count($arr);
+            syslog(LOG_INFO, 'Found '.$rowCount.' records');
 
-        if (!empty($arr)) {
-            $this->obj_store->delete($arr);
-        }
+            if (!empty($arr)) {
+                $this->obj_store->delete($arr);
+            }
+        } while ($rowCount > 0);
     }
 }
